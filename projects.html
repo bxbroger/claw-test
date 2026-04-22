@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Projects</title>
+  <meta name="description" content="Project grid page for immersive studio demo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="projects">
+  <canvas id="ambient-canvas" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="site-header" id="site-header">
+    <a class="logo" href="./index.html">NOVA</a>
+    <nav class="site-nav">
+      <a href="./index.html">Home</a>
+      <a class="active" href="./projects.html">Projects</a>
+      <a href="mailto:hello@nova.studio">Contact</a>
+    </nav>
+    <a class="talk-btn magnetic" href="mailto:hello@nova.studio">Start a project</a>
+  </header>
+
+  <main class="projects-page">
+    <section class="hero compact section reveal">
+      <p class="eyebrow">SELECTED CASES</p>
+      <h1>Projects built around motion, atmosphere, and interaction.</h1>
+      <p class="hero-sub">A second page to match the multi-page rhythm from the original reference.</p>
+    </section>
+
+    <section class="projects-list section">
+      <article class="project-row reveal" data-parallax="0.07">
+        <div class="row-visual color-e"></div>
+        <div class="row-content">
+          <p>WEB • DESIGN • 3D</p>
+          <h2>Solstice Engine</h2>
+          <a class="inline-link" href="./index.html">Open concept</a>
+        </div>
+      </article>
+
+      <article class="project-row reveal" data-parallax="0.04">
+        <div class="row-visual color-f"></div>
+        <div class="row-content">
+          <p>CAMPAIGN • INTERACTIVE • DEV</p>
+          <h2>Mirror District</h2>
+          <a class="inline-link" href="./index.html">Open concept</a>
+        </div>
+      </article>
+
+      <article class="project-row reveal" data-parallax="0.06">
+        <div class="row-visual color-g"></div>
+        <div class="row-content">
+          <p>EXPERIENCE • STORY • FRONTEND</p>
+          <h2>Terminal Bloom</h2>
+          <a class="inline-link" href="./index.html">Open concept</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Nova Demo Studio © 2026</p>
+    <a href="./index.html">Back to home</a>
+  </footer>
+
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+  <script src="./main.js"></script>
+</body>
+</html>

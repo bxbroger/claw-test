@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Immersive Studio</title>
+  <meta name="description" content="Immersive 3D-inspired web storytelling studio demo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="home">
+  <canvas id="ambient-canvas" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="site-header" id="site-header">
+    <a class="logo" href="./index.html">NOVA</a>
+    <nav class="site-nav">
+      <a class="active" href="./index.html">Home</a>
+      <a href="./projects.html">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="talk-btn magnetic" href="mailto:hello@nova.studio">Let's talk</a>
+  </header>
+
+  <main>
+    <section class="hero section reveal">
+      <p class="eyebrow">SCROLL TO EXPLORE</p>
+      <h1>
+        We design high-impact digital worlds with motion, depth, and unforgettable web storytelling.
+      </h1>
+      <p class="hero-sub">
+        A Lusion-inspired showcase concept: bold typography, cinematic transitions, and interaction-led design.
+      </p>
+      <a class="pill-link magnetic" href="./projects.html">View featured work</a>
+      <div class="hero-orbits" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+    </section>
+
+    <section class="intro section reveal">
+      <h2>Bold Ideas, Brought to Motion</h2>
+      <p>
+        We blend visual direction, 3D aesthetics, and frontend craft to make sites that feel alive.
+        The layout borrows the spirit of Lusion: oversized rhythm, kinetic layering, and gallery-first storytelling.
+      </p>
+    </section>
+
+    <section class="featured section">
+      <div class="section-head reveal">
+        <h3>Featured Work</h3>
+        <p>A selection of immersive concepts designed for ambitious brands.</p>
+      </div>
+
+      <div class="project-grid">
+        <article class="project-card reveal" data-parallax="0.09">
+          <div class="project-media color-a"></div>
+          <p class="project-meta">CONCEPT • WEB • 3D • MOTION</p>
+          <h4>Atlas Signal</h4>
+        </article>
+        <article class="project-card reveal" data-parallax="0.06">
+          <div class="project-media color-b"></div>
+          <p class="project-meta">DESIGN • DEVELOPMENT • VISUALS</p>
+          <h4>Echo Vessel</h4>
+        </article>
+        <article class="project-card reveal" data-parallax="0.08">
+          <div class="project-media color-c"></div>
+          <p class="project-meta">BRAND WORLD • 3D • CAMPAIGN</p>
+          <h4>Neon Dune</h4>
+        </article>
+        <article class="project-card reveal" data-parallax="0.05">
+          <div class="project-media color-d"></div>
+          <p class="project-meta">INTERACTIVE • WEBGL STYLE • UI</p>
+          <h4>Polar Drift</h4>
+        </article>
+      </div>
+    </section>
+
+    <section class="marquee section">
+      <div class="marquee-track" aria-hidden="true">
+        <span>IMMERSIVE STORIES</span>
+        <span>3D CRAFT</span>
+        <span>INTERACTIVE FRONTEND</span>
+        <span>IMMERSIVE STORIES</span>
+        <span>3D CRAFT</span>
+        <span>INTERACTIVE FRONTEND</span>
+      </div>
+    </section>
+
+    <section class="game-section section reveal" id="game">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">MINI GAME</p>
+          <h3>Brick Breaker</h3>
+        </div>
+        <p class="game-hint">← → 或 滑鼠移動控制板子 &nbsp;·&nbsp; Space 暫停 / 開始</p>
+      </div>
+      <div class="game-wrapper">
+        <canvas id="breakout-canvas" width="760" height="480" tabindex="0" aria-label="打磚塊遊戲"></canvas>
+        <div class="game-overlay" id="game-overlay">
+          <p class="game-overlay-title" id="overlay-title">BRICK BREAKER</p>
+          <p class="game-overlay-sub" id="overlay-sub">按 Space 或點擊畫面開始</p>
+          <button class="game-start-btn" id="game-start-btn">▶ 開始遊戲</button>
+        </div>
+      </div>
+      <div class="game-stats" aria-live="polite">
+        <span>分數 <strong id="score-display">0</strong></span>
+        <span>最高分 <strong id="hiscore-display">0</strong></span>
+        <span>生命 <strong id="lives-display">♥ ♥ ♥</strong></span>
+      </div>
+    </section>
+
+    <section class="cta section reveal" id="contact">
+      <p class="eyebrow">NEXT CHAPTER</p>
+      <h2>Is your big idea ready to go wild?</h2>
+      <a class="talk-giant magnetic" href="mailto:business@nova.studio">Let's build together</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Nova Demo Studio © 2026</p>
+    <a href="./projects.html">Next page: Projects</a>
+  </footer>
+
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+  <script src="./main.js"></script>
+  <script>
+  /* ── Breakout Game ── */
+  (function () {
+    const canvas = document.getElementById('breakout-canvas');
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('game-overlay');
+    const overlayTitle = document.getElementById('overlay-title');
+    const overlaySub = document.getElementById('overlay-sub');
+    const startBtn = document.getElementById('game-start-btn');
+    const scoreEl = document.getElementById('score-display');
+    const hiscoreEl = document.getElementById('hiscore-display');
+    const livesEl = document.getElementById('lives-display');
+
+    const W = 760, H = 480;
+    const BRICK_COLS = 10, BRICK_ROWS = 5;
+    const BRICK_W = 62, BRICK_H = 22, BRICK_GAP = 6;
+    const BRICK_OFFSET_X = (W - (BRICK_COLS * (BRICK_W + BRICK_GAP) - BRICK_GAP)) / 2;
+    const BRICK_OFFSET_Y = 56;
+
+    const PADDLE_W = 110, PADDLE_H = 12, PADDLE_Y = H - 44;
+    const BALL_R = 8;
+    const COLORS = [
+      '#7ee7ff','#ffd46b','#44a37f','#91518a','#347ab8',
+      '#aa8846','#679844','#6e5c1a','#347ab8','#44a37f'
+    ];
+
+    let state = 'idle'; // idle | running | paused | over | win
+    let score = 0, hiScore = 0, lives = 3;
+    let paddle = { x: W / 2 - PADDLE_W / 2, vx: 0 };
+    let ball = {};
+    let bricks = [];
+    let mouseX = null;
+    let keys = {};
+    let rafId;
+    let lastTime = 0;
+
+    function resetBall() {
+      ball = {
+        x: W / 2,
+        y: PADDLE_Y - BALL_R - 2,
+        vx: (Math.random() < 0.5 ? 1 : -1) * 4.2,
+        vy: -4.8,
+        speed: 1
+      };
+    }
+
+    function resetPaddle() {
+      paddle.x = W / 2 - PADDLE_W / 2;
+    }
+
+    function buildBricks() {
+      bricks = [];
+      for (let r = 0; r < BRICK_ROWS; r++) {
+        for (let c = 0; c < BRICK_COLS; c++) {
+          bricks.push({
+            x: BRICK_OFFSET_X + c * (BRICK_W + BRICK_GAP),
+            y: BRICK_OFFSET_Y + r * (BRICK_H + BRICK_GAP),
+            alive: true,
+            color: COLORS[r],
+            flash: 0
+          });
+        }
+      }
+    }
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      resetPaddle();
+      resetBall();
+      buildBricks();
+      updateUI();
+      setState('running');
+    }
+
+    function setState(s) {
+      state = s;
+      if (s === 'running') {
+        overlay.classList.add('hidden');
+        canvas.focus();
+        lastTime = performance.now();
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(loop);
+      } else if (s === 'paused') {
+        overlayTitle.textContent = 'PAUSED';
+        overlaySub.textContent = '按 Space 或點擊繼續';
+        startBtn.textContent = '▶ 繼續';
+        overlay.classList.remove('hidden');
+        cancelAnimationFrame(rafId);
+      } else if (s === 'over') {
+        if (score > hiScore) { hiScore = score; hiscoreEl.textContent = hiScore; }
+        overlayTitle.textContent = 'GAME OVER';
+        overlaySub.textContent = `得分：${score}`;
+        startBtn.textContent = '↺ 再玩一次';
+        overlay.classList.remove('hidden');
+        cancelAnimationFrame(rafId);
+      } else if (s === 'win') {
+        if (score > hiScore) { hiScore = score; hiscoreEl.textContent = hiScore; }
+        overlayTitle.textContent = '🎉 YOU WIN!';
+        overlaySub.textContent = `完美得分：${score}`;
+        startBtn.textContent = '↺ 再玩一次';
+        overlay.classList.remove('hidden');
+        cancelAnimationFrame(rafId);
+      } else {
+        overlayTitle.textContent = 'BRICK BREAKER';
+        overlaySub.textContent = '按 Space 或點擊畫面開始';
+        startBtn.textContent = '▶ 開始遊戲';
+        overlay.classList.remove('hidden');
+      }
+    }
+
+    function updateUI() {
+      scoreEl.textContent = score;
+      hiscoreEl.textContent = hiScore;
+      livesEl.textContent = '♥ '.repeat(lives).trim();
+    }
+
+    /* ── input ── */
+    document.addEventListener('keydown', e => {
+      keys[e.code] = true;
+      if ((e.code === 'Space') && canvas.closest('#game')) {
+        e.preventDefault();
+        if (state === 'idle' || state === 'over' || state === 'win') startGame();
+        else if (state === 'running') setState('paused');
+        else if (state === 'paused') setState('running');
+      }
+    });
+    document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      mouseX = (e.clientX - rect.left) * scaleX;
+    });
+    canvas.addEventListener('mouseleave', () => { mouseX = null; });
+
+    canvas.addEventListener('click', () => {
+      if (state === 'idle' || state === 'over' || state === 'win') startGame();
+      else if (state === 'running') setState('paused');
+      else if (state === 'paused') setState('running');
+    });
+
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      mouseX = (e.touches[0].clientX - rect.left) * scaleX;
+    }, { passive: false });
+
+    startBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (state === 'idle' || state === 'over' || state === 'win') startGame();
+      else if (state === 'paused') setState('running');
+    });
+
+    /* ── physics ── */
+    function loop(ts) {
+      const dt = Math.min((ts - lastTime) / 16.667, 3);
+      lastTime = ts;
+      update(dt);
+      draw();
+      if (state === 'running') rafId = requestAnimationFrame(loop);
+    }
+
+    function update(dt) {
+      /* paddle */
+      const speed = 9 * dt;
+      if (mouseX !== null) {
+        const target = mouseX - PADDLE_W / 2;
+        paddle.x += (target - paddle.x) * 0.18 * dt * 3.5;
+      } else {
+        if (keys['ArrowLeft'] || keys['KeyA']) paddle.x -= speed;
+        if (keys['ArrowRight'] || keys['KeyD']) paddle.x += speed;
+      }
+      paddle.x = Math.max(0, Math.min(W - PADDLE_W, paddle.x));
+
+      /* ball */
+      const spd = 1 + score * 0.002;
+      ball.x += ball.vx * spd * dt;
+      ball.y += ball.vy * spd * dt;
+
+      /* walls */
+      if (ball.x - BALL_R < 0) { ball.x = BALL_R; ball.vx = Math.abs(ball.vx); }
+      if (ball.x + BALL_R > W) { ball.x = W - BALL_R; ball.vx = -Math.abs(ball.vx); }
+      if (ball.y - BALL_R < 0) { ball.y = BALL_R; ball.vy = Math.abs(ball.vy); }
+
+      /* ball falls */
+      if (ball.y + BALL_R > H + 20) {
+        lives--;
+        updateUI();
+        if (lives <= 0) { setState('over'); return; }
+        resetPaddle();
+        resetBall();
+      }
+
+      /* paddle collision */
+      if (
+        ball.vy > 0 &&
+        ball.y + BALL_R >= PADDLE_Y &&
+        ball.y + BALL_R <= PADDLE_Y + PADDLE_H + 4 &&
+        ball.x >= paddle.x - 4 &&
+        ball.x <= paddle.x + PADDLE_W + 4
+      ) {
+        ball.vy = -Math.abs(ball.vy);
+        const hit = (ball.x - (paddle.x + PADDLE_W / 2)) / (PADDLE_W / 2);
+        ball.vx = hit * 6.5;
+        ball.y = PADDLE_Y - BALL_R - 1;
+      }
+
+      /* brick collision */
+      let allDead = true;
+      for (const b of bricks) {
+        if (!b.alive) continue;
+        allDead = false;
+        if (
+          ball.x + BALL_R > b.x &&
+          ball.x - BALL_R < b.x + BRICK_W &&
+          ball.y + BALL_R > b.y &&
+          ball.y - BALL_R < b.y + BRICK_H
+        ) {
+          b.alive = false;
+          b.flash = 1;
+          score += 10;
+          updateUI();
+
+          const overlapL = (ball.x + BALL_R) - b.x;
+          const overlapR = (b.x + BRICK_W) - (ball.x - BALL_R);
+          const overlapT = (ball.y + BALL_R) - b.y;
+          const overlapB = (b.y + BRICK_H) - (ball.y - BALL_R);
+          const minH = Math.min(overlapL, overlapR);
+          const minV = Math.min(overlapT, overlapB);
+          if (minH < minV) ball.vx = -ball.vx;
+          else ball.vy = -ball.vy;
+          break;
+        }
+      }
+      if (allDead) { setState('win'); return; }
+    }
+
+    /* ── rendering ── */
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      /* background grid */
+      ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < W; x += 38) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+      for (let y = 0; y < H; y += 38) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+      /* bricks */
+      for (const b of bricks) {
+        if (!b.alive) continue;
+        const grd = ctx.createLinearGradient(b.x, b.y, b.x, b.y + BRICK_H);
+        grd.addColorStop(0, b.color + 'cc');
+        grd.addColorStop(1, b.color + '66');
+        ctx.fillStyle = grd;
+        roundRect(ctx, b.x, b.y, BRICK_W, BRICK_H, 5);
+        ctx.fill();
+        ctx.strokeStyle = b.color + '88';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      /* paddle */
+      const pg = ctx.createLinearGradient(paddle.x, PADDLE_Y, paddle.x + PADDLE_W, PADDLE_Y);
+      pg.addColorStop(0, '#7ee7ff');
+      pg.addColorStop(0.5, '#ffffff');
+      pg.addColorStop(1, '#7ee7ff');
+      ctx.fillStyle = pg;
+      roundRect(ctx, paddle.x, PADDLE_Y, PADDLE_W, PADDLE_H, 6);
+      ctx.fill();
+
+      /* paddle glow */
+      ctx.shadowColor = '#7ee7ff';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = 'rgba(126,231,255,0.25)';
+      roundRect(ctx, paddle.x, PADDLE_Y, PADDLE_W, PADDLE_H, 6);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      /* ball */
+      ctx.shadowColor = '#7ee7ff';
+      ctx.shadowBlur = 22;
+      const bg = ctx.createRadialGradient(ball.x - 2, ball.y - 2, 1, ball.x, ball.y, BALL_R);
+      bg.addColorStop(0, '#ffffff');
+      bg.addColorStop(0.5, '#7ee7ff');
+      bg.addColorStop(1, '#3a9bb5');
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      /* mouse cursor dot on canvas */
+      if (mouseX !== null) {
+        ctx.fillStyle = 'rgba(126,231,255,0.35)';
+        ctx.beginPath();
+        ctx.arc(mouseX, PADDLE_Y + PADDLE_H / 2, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    /* initial static draw */
+    buildBricks();
+    draw();
+  })();
+  </script>
+</body>
+</html>
