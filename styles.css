@@ -558,3 +558,156 @@ main {
     gap: 0.6rem;
   }
 }
+
+/* ── Custom Cursor ── */
+@media (pointer: fine) {
+  body,
+  a,
+  button {
+    cursor: none;
+  }
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+}
+
+.cursor-ring {
+  z-index: 9998;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(126, 231, 255, 0.7);
+  transition: width 0.22s ease, height 0.22s ease, border-color 0.22s ease, opacity 0.3s ease;
+}
+
+.cursor-ring.hovered {
+  width: 58px;
+  height: 58px;
+  border-color: rgba(126, 231, 255, 1);
+}
+
+.cursor-ring.clicking {
+  width: 24px;
+  height: 24px;
+  background: rgba(126, 231, 255, 0.15);
+}
+
+/* ── Page Transition ── */
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: #070b11;
+  transform: translateY(0%);
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+  pointer-events: none;
+}
+
+.page-transition.revealed {
+  transform: translateY(-100%);
+}
+
+.page-transition.covering {
+  transform: translateY(0%);
+  pointer-events: all;
+}
+
+/* ── Split-text Word Reveal ── */
+.word-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: 1.1;
+}
+
+.word {
+  display: inline-block;
+  transform: translateY(105%);
+  opacity: 0;
+  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s ease;
+}
+
+.word.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ── Header Scroll Behavior ── */
+.site-header {
+  transition: transform 0.4s ease, background 0.4s ease, padding 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.site-header.scrolled {
+  background: rgba(7, 11, 17, 0.92);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.site-header.hidden {
+  transform: translateY(-100%);
+}
+
+/* ── 3D Card Tilt ── */
+.project-card,
+.project-row {
+  transform-style: preserve-3d;
+  transition: border-color 0.35s ease;
+  will-change: transform;
+}
+
+.project-card:hover,
+.project-row:hover {
+  border-color: rgba(255, 255, 255, 0.48);
+}
+
+/* ── Stagger Reveal for grid items ── */
+.project-grid .project-card:nth-child(1) { transition-delay: 0s; }
+.project-grid .project-card:nth-child(2) { transition-delay: 0.1s; }
+.project-grid .project-card:nth-child(3) { transition-delay: 0.2s; }
+.project-grid .project-card:nth-child(4) { transition-delay: 0.3s; }
+
+.projects-list .project-row:nth-child(1) { transition-delay: 0s; }
+.projects-list .project-row:nth-child(2) { transition-delay: 0.12s; }
+.projects-list .project-row:nth-child(3) { transition-delay: 0.24s; }
+
+/* ── Enhanced Link hover ── */
+.pill-link,
+.talk-giant,
+.talk-btn {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.28s ease, background 0.28s ease, box-shadow 0.28s ease;
+}
+
+.pill-link:hover {
+  transform: translateY(-3px);
+  border-color: rgba(126, 231, 255, 0.9);
+  background: rgba(126, 231, 255, 0.14);
+  box-shadow: 0 8px 24px rgba(126, 231, 255, 0.12);
+}
+
+.talk-giant:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 212, 107, 0.7);
+  background: rgba(255, 212, 107, 0.16);
+  box-shadow: 0 8px 28px rgba(255, 212, 107, 0.12);
+}
