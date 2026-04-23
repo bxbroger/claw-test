@@ -114,6 +114,29 @@
       </div>
     </section>
 
+    <section class="game-section snake-section section reveal" id="snake">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">MINI GAME</p>
+          <h3>貪食蛇</h3>
+        </div>
+        <p class="game-hint">↑ ↓ ← → 或 WASD 控制方向 &nbsp;·&nbsp; Space 暫停 / 開始</p>
+      </div>
+      <div class="game-wrapper snake-wrapper">
+        <canvas id="snake-canvas" width="560" height="560" tabindex="0" aria-label="貪食蛇遊戲"></canvas>
+        <div class="game-overlay" id="snake-overlay">
+          <p class="game-overlay-title" id="snake-overlay-title">SNAKE</p>
+          <p class="game-overlay-sub" id="snake-overlay-sub">按 Space 或點擊畫面開始</p>
+          <button class="game-start-btn" id="snake-start-btn">▶ 開始遊戲</button>
+        </div>
+      </div>
+      <div class="game-stats" aria-live="polite">
+        <span>分數 <strong id="snake-score-display">0</strong></span>
+        <span>最高分 <strong id="snake-hiscore-display">0</strong></span>
+        <span>長度 <strong id="snake-length-display">1</strong></span>
+      </div>
+    </section>
+
     <section class="cta section reveal" id="contact">
       <p class="eyebrow">NEXT CHAPTER</p>
       <h2>Is your big idea ready to go wild?</h2>
@@ -128,6 +151,266 @@
 
   <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
   <script src="./main.js"></script>
+  <script>
+  /* ── Snake Game ── */
+  (function () {
+    const canvas = document.getElementById('snake-canvas');
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('snake-overlay');
+    const overlayTitle = document.getElementById('snake-overlay-title');
+    const overlaySub = document.getElementById('snake-overlay-sub');
+    const startBtn = document.getElementById('snake-start-btn');
+    const scoreEl = document.getElementById('snake-score-display');
+    const hiscoreEl = document.getElementById('snake-hiscore-display');
+    const lengthEl = document.getElementById('snake-length-display');
+
+    const COLS = 20, ROWS = 20;
+    const W = 560, H = 560;
+    const CELL = W / COLS; // 28px
+
+    let state = 'idle'; // idle | running | paused | over | win
+    let score = 0, hiScore = 0;
+    let snake = [], dir = { x: 1, y: 0 }, nextDir = { x: 1, y: 0 };
+    let food = {};
+    let rafId, lastTime = 0, stepAccum = 0, stepInterval = 130;
+
+    function resetGame() {
+      const cx = Math.floor(COLS / 2);
+      const cy = Math.floor(ROWS / 2);
+      snake = [{ x: cx, y: cy }, { x: cx - 1, y: cy }, { x: cx - 2, y: cy }];
+      dir = { x: 1, y: 0 };
+      nextDir = { x: 1, y: 0 };
+      score = 0;
+      stepInterval = 130;
+      stepAccum = 0;
+      placeFood();
+      updateUI();
+    }
+
+    function placeFood() {
+      let pos;
+      do {
+        pos = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
+      } while (snake.some(s => s.x === pos.x && s.y === pos.y));
+      food = pos;
+    }
+
+    function setState(s) {
+      state = s;
+      if (s === 'running') {
+        overlay.classList.add('hidden');
+        canvas.focus();
+        lastTime = performance.now();
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(loop);
+      } else if (s === 'paused') {
+        overlayTitle.textContent = 'PAUSED';
+        overlaySub.textContent = '按 Space 或點擊繼續';
+        startBtn.textContent = '▶ 繼續';
+        overlay.classList.remove('hidden');
+        cancelAnimationFrame(rafId);
+      } else if (s === 'over') {
+        if (score > hiScore) { hiScore = score; hiscoreEl.textContent = hiScore; }
+        overlayTitle.textContent = 'GAME OVER';
+        overlaySub.textContent = `得分：${score}`;
+        startBtn.textContent = '↺ 再玩一次';
+        overlay.classList.remove('hidden');
+        cancelAnimationFrame(rafId);
+      } else {
+        overlayTitle.textContent = 'SNAKE';
+        overlaySub.textContent = '按 Space 或點擊畫面開始';
+        startBtn.textContent = '▶ 開始遊戲';
+        overlay.classList.remove('hidden');
+      }
+    }
+
+    function startGame() {
+      resetGame();
+      setState('running');
+    }
+
+    function updateUI() {
+      scoreEl.textContent = score;
+      hiscoreEl.textContent = hiScore;
+      lengthEl.textContent = snake.length;
+    }
+
+    /* ── game loop ── */
+    function loop(ts) {
+      const dt = Math.min(ts - lastTime, 200);
+      lastTime = ts;
+      stepAccum += dt;
+      if (stepAccum >= stepInterval) {
+        stepAccum -= stepInterval;
+        step();
+      }
+      if (state === 'running') {
+        draw();
+        rafId = requestAnimationFrame(loop);
+      }
+    }
+
+    function step() {
+      dir = nextDir;
+      const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+      if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+        draw();
+        setState('over');
+        return;
+      }
+      if (snake.some(s => s.x === head.x && s.y === head.y)) {
+        draw();
+        setState('over');
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        stepInterval = Math.max(55, stepInterval - 3);
+        placeFood();
+        updateUI();
+      } else {
+        snake.pop();
+      }
+    }
+
+    /* ── rendering ── */
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      /* background grid */
+      ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= W; x += CELL) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+      for (let y = 0; y <= H; y += CELL) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+      /* food */
+      const fx = food.x * CELL + CELL / 2;
+      const fy = food.y * CELL + CELL / 2;
+      ctx.shadowColor = '#ffd46b';
+      ctx.shadowBlur = 18;
+      const fg = ctx.createRadialGradient(fx - 2, fy - 2, 1, fx, fy, CELL / 2 - 3);
+      fg.addColorStop(0, '#fff7d6');
+      fg.addColorStop(1, '#ffd46b');
+      ctx.fillStyle = fg;
+      ctx.beginPath();
+      ctx.arc(fx, fy, CELL / 2 - 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      /* snake */
+      const len = snake.length;
+      snake.forEach((seg, i) => {
+        const x = seg.x * CELL;
+        const y = seg.y * CELL;
+        const fade = 1 - (i / len) * 0.55;
+        const pad = i === 0 ? 1 : 2;
+        const r = i === 0 ? 8 : 5;
+
+        if (i === 0) {
+          ctx.shadowColor = '#7ee7ff';
+          ctx.shadowBlur = 22;
+          const grd = ctx.createLinearGradient(x, y, x + CELL, y + CELL);
+          grd.addColorStop(0, `rgba(126,231,255,${fade})`);
+          grd.addColorStop(1, `rgba(58,155,181,${fade})`);
+          ctx.fillStyle = grd;
+        } else {
+          ctx.shadowBlur = 0;
+          const grd = ctx.createLinearGradient(x, y, x + CELL, y + CELL);
+          grd.addColorStop(0, `rgba(68,163,127,${fade})`);
+          grd.addColorStop(1, `rgba(52,122,184,${fade * 0.75})`);
+          ctx.fillStyle = grd;
+        }
+
+        roundRect(ctx, x + pad, y + pad, CELL - pad * 2, CELL - pad * 2, r);
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+    }
+
+    function roundRect(c, x, y, w, h, r) {
+      c.beginPath();
+      c.moveTo(x + r, y);
+      c.lineTo(x + w - r, y);
+      c.quadraticCurveTo(x + w, y, x + w, y + r);
+      c.lineTo(x + w, y + h - r);
+      c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      c.lineTo(x + r, y + h);
+      c.quadraticCurveTo(x, y + h, x, y + h - r);
+      c.lineTo(x, y + r);
+      c.quadraticCurveTo(x, y, x + r, y);
+      c.closePath();
+    }
+
+    /* ── input ── */
+    const DIR_MAP = {
+      'ArrowUp': { x: 0, y: -1 }, 'KeyW': { x: 0, y: -1 },
+      'ArrowDown': { x: 0, y: 1 }, 'KeyS': { x: 0, y: 1 },
+      'ArrowLeft': { x: -1, y: 0 }, 'KeyA': { x: -1, y: 0 },
+      'ArrowRight': { x: 1, y: 0 }, 'KeyD': { x: 1, y: 0 }
+    };
+
+    let snakeSectionVisible = false;
+    new IntersectionObserver(entries => {
+      snakeSectionVisible = entries[0].isIntersecting;
+    }, { threshold: 0.3 }).observe(document.getElementById('snake'));
+
+    document.addEventListener('keydown', e => {
+      const d = DIR_MAP[e.code];
+      if (d && state === 'running') {
+        if (d.x !== -dir.x || d.y !== -dir.y) {
+          nextDir = d;
+          e.preventDefault();
+        }
+      }
+      if (e.code === 'Space' && snakeSectionVisible) {
+        e.preventDefault();
+        if (state === 'idle' || state === 'over') startGame();
+        else if (state === 'running') setState('paused');
+        else if (state === 'paused') setState('running');
+      }
+    });
+
+    canvas.addEventListener('click', () => {
+      if (state === 'idle' || state === 'over') startGame();
+      else if (state === 'running') setState('paused');
+      else if (state === 'paused') setState('running');
+    });
+
+    startBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (state === 'idle' || state === 'over') startGame();
+      else if (state === 'paused') setState('running');
+    });
+
+    /* touch swipe */
+    let touchStartX = 0, touchStartY = 0;
+    canvas.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    canvas.addEventListener('touchend', e => {
+      if (state !== 'running') return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        const d = dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 };
+        if (d.x !== -dir.x || d.y !== -dir.y) nextDir = d;
+      } else {
+        const d = dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 };
+        if (d.x !== -dir.x || d.y !== -dir.y) nextDir = d;
+      }
+    }, { passive: true });
+
+    /* initial static draw */
+    resetGame();
+    draw();
+  })();
+  </script>
   <script>
   /* ── Breakout Game ── */
   (function () {

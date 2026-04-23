@@ -450,13 +450,23 @@ main {
   box-shadow: 0 0 60px rgba(126, 231, 255, 0.05);
 }
 
-#breakout-canvas {
+#breakout-canvas,
+#snake-canvas {
   display: block;
   width: 100%;
   height: auto;
   cursor: none;
   outline: none;
   border-radius: 18px;
+}
+
+/* ── Snake Game ── */
+.snake-wrapper {
+  max-width: 560px;
+}
+
+#snake-canvas {
+  aspect-ratio: 1 / 1;
 }
 
 .game-overlay {
